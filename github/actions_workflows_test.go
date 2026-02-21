@@ -251,25 +251,25 @@ func TestActionsService_CreateWorkflowDispatchEventByID(t *testing.T) {
 	})
 
 	ctx := t.Context()
-	_, err := client.Actions.CreateWorkflowDispatchEventByID(ctx, "o", "r", 72844, event)
+	_, _, err := client.Actions.CreateWorkflowDispatchEventByID(ctx, "o", "r", 72844, event)
 	if err != nil {
 		t.Errorf("Actions.CreateWorkflowDispatchEventByID returned error: %v", err)
 	}
 
 	// Test s.client.NewRequest failure
 	client.BaseURL.Path = ""
-	_, err = client.Actions.CreateWorkflowDispatchEventByID(ctx, "o", "r", 72844, event)
+	_, _, err = client.Actions.CreateWorkflowDispatchEventByID(ctx, "o", "r", 72844, event)
 	if err == nil {
 		t.Error("client.BaseURL.Path='' CreateWorkflowDispatchEventByID err = nil, want error")
 	}
 
 	const methodName = "CreateWorkflowDispatchEventByID"
 	testBadOptions(t, methodName, func() (err error) {
-		_, err = client.Actions.CreateWorkflowDispatchEventByID(ctx, "o", "r", 72844, event)
+		_, _, err = client.Actions.CreateWorkflowDispatchEventByID(ctx, "o", "r", 72844, event)
 		return err
 	})
 
-	testNewRequestAndDoFailure(t, methodName, client, func() (*Response, error) {
+	testNewRequestAndDoFailureWithWorkflowDispatch(t, methodName, client, func() (*CreateWorkflowDispatchResponse, *Response, error) {
 		return client.Actions.CreateWorkflowDispatchEventByID(ctx, "o", "r", 72844, event)
 	})
 }
@@ -295,25 +295,25 @@ func TestActionsService_CreateWorkflowDispatchEventByFileName(t *testing.T) {
 	})
 
 	ctx := t.Context()
-	_, err := client.Actions.CreateWorkflowDispatchEventByFileName(ctx, "o", "r", "main.yml", event)
+	_, _, err := client.Actions.CreateWorkflowDispatchEventByFileName(ctx, "o", "r", "main.yml", event)
 	if err != nil {
 		t.Errorf("Actions.CreateWorkflowDispatchEventByFileName returned error: %v", err)
 	}
 
 	// Test s.client.NewRequest failure
 	client.BaseURL.Path = ""
-	_, err = client.Actions.CreateWorkflowDispatchEventByFileName(ctx, "o", "r", "main.yml", event)
+	_, _, err = client.Actions.CreateWorkflowDispatchEventByFileName(ctx, "o", "r", "main.yml", event)
 	if err == nil {
 		t.Error("client.BaseURL.Path='' CreateWorkflowDispatchEventByFileName err = nil, want error")
 	}
 
 	const methodName = "CreateWorkflowDispatchEventByFileName"
 	testBadOptions(t, methodName, func() (err error) {
-		_, err = client.Actions.CreateWorkflowDispatchEventByFileName(ctx, "o", "r", "main.yml", event)
+		_, _, err = client.Actions.CreateWorkflowDispatchEventByFileName(ctx, "o", "r", "main.yml", event)
 		return err
 	})
 
-	testNewRequestAndDoFailure(t, methodName, client, func() (*Response, error) {
+	testNewRequestAndDoFailureWithWorkflowDispatch(t, methodName, client, func() (*CreateWorkflowDispatchResponse, *Response, error) {
 		return client.Actions.CreateWorkflowDispatchEventByFileName(ctx, "o", "r", "main.yml", event)
 	})
 }

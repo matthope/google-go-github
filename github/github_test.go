@@ -243,6 +243,50 @@ func testNewRequestAndDoFailureCategory(t *testing.T, methodName string, client 
 	}
 }
 
+// testNewRequestAndDoFailureWithWorkflowDispatch tests methods that return (*CreateWorkflowDispatchResponse, *Response, error).
+// Method f should be a regular call that would normally succeed, but
+// should return an error when NewRequest or s.client.Do fails.
+func testNewRequestAndDoFailureWithWorkflowDispatch(t *testing.T, methodName string, client *Client, f func() (*CreateWorkflowDispatchResponse, *Response, error)) {
+	testNewRequestAndDoFailureWithWorkflowDispatchCategory(t, methodName, client, CoreCategory, f)
+}
+
+// testNewRequestAndDoFailureWithWorkflowDispatchCategory works like testNewRequestAndDoFailureWithWorkflowDispatch, but allows setting the category.
+func testNewRequestAndDoFailureWithWorkflowDispatchCategory(t *testing.T, methodName string, client *Client, category RateLimitCategory, f func() (*CreateWorkflowDispatchResponse, *Response, error)) {
+	t.Helper()
+	if methodName == "" {
+		t.Error("testNewRequestAndDoFailureWithWorkflowDispatch: must supply method methodName")
+	}
+
+	client.BaseURL.Path = ""
+	_, resp, err := f()
+	if resp != nil {
+		t.Errorf("client.BaseURL.Path='' %v resp = %#v, want nil", methodName, resp)
+	}
+	if err == nil {
+		t.Errorf("client.BaseURL.Path='' %v err = nil, want error", methodName)
+	}
+
+	client.BaseURL.Path = "/api-v3/"
+	client.rateLimits[category].Reset.Time = time.Now().Add(10 * time.Minute)
+	_, resp, err = f()
+	if client.DisableRateLimitCheck {
+		return
+	}
+	if bypass := resp.Request.Context().Value(BypassRateLimitCheck); bypass != nil {
+		return
+	}
+	if want := http.StatusForbidden; resp == nil || resp.Response.StatusCode != want {
+		if resp != nil {
+			t.Errorf("rate.Reset.Time > now %v resp = %#v, want StatusCode=%v", methodName, resp.Response, want)
+		} else {
+			t.Errorf("rate.Reset.Time > now %v resp = nil, want StatusCode=%v", methodName, want)
+		}
+	}
+	if err == nil {
+		t.Errorf("rate.Reset.Time > now %v err = nil, want error", methodName)
+	}
+}
+
 // Test that all error response types contain the status code.
 func testErrorResponseForStatusCode(t *testing.T, code int) {
 	t.Helper()
